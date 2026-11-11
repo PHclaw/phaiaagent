@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="PHAiagent logo">
+  <title>PHAiagent · Personal Help AI Agent</title>
+  <defs>
+    <!-- userSpaceOnUse：所有像素块共享同一坐标系，渐变才连续，否则每块各算各的会出现色阶条纹 -->
+    <linearGradient id="mark" gradientUnits="userSpaceOnUse" x1="104" y1="88" x2="144" y2="168">
+      <stop offset="0" stop-color="#1d4ed8"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#0f172a"/>
+  <g transform="translate(32,32)">
+    <rect x="36" y="12" width="120" height="12" fill="#ffffff"/>
+    <rect x="24" y="24" width="144" height="12" fill="#ffffff"/>
+    <rect x="12" y="36" width="168" height="12" fill="#ffffff"/>
+    <rect x="12" y="48" width="168" height="12" fill="#ffffff"/>
+    <rect x="12" y="60" width="72" height="12" fill="#ffffff"/>
+    <rect x="84" y="60" width="48" height="12" fill="url(#mark)"/>
+    <rect x="132" y="60" width="48" height="12" fill="#ffffff"/>
+    <rect x="12" y="72" width="72" height="12" fill="#ffffff"/>
+    <rect x="84" y="72" width="12" height="12" fill="url(#mark)"/>
+    <rect x="96" y="72" width="24" height="12" fill="#ffffff"/>
+    <rect x="120" y="72" width="12" height="12" fill="url(#mark)"/>
+    <rect x="132" y="72" width="48" height="12" fill="#ffffff"/>
+    <rect x="12" y="84" width="72" height="12" fill="#ffffff"/>
+    <rect x="84" y="84" width="12" height="12" fill="url(#mark)"/>
+    <rect x="96" y="84" width="24" height="12" fill="#ffffff"/>
+    <rect x="120" y="84" width="12" height="12" fill="url(#mark)"/>
+    <rect x="132" y="84" width="48" height="12" fill="#ffffff"/>
+    <rect x="12" y="96" width="72" height="12" fill="#ffffff"/>
+    <rect x="84" y="96" width="48" height="12" fill="url(#mark)"/>
+    <rect x="132" y="96" width="48" height="12" fill="#ffffff"/>
+    <rect x="12" y="108" width="72" height="12" fill="#ffffff"/>
+    <rect x="84" y="108" width="12" height="12" fill="url(#mark)"/>
+    <rect x="96" y="108" width="84" height="12" fill="#ffffff"/>
+    <rect x="12" y="120" width="72" height="12" fill="#ffffff"/>
+    <rect x="84" y="120" width="12" height="12" fill="url(#mark)"/>
+    <rect x="96" y="120" width="84" height="12" fill="#ffffff"/>
+    <rect x="12" y="132" width="72" height="12" fill="#ffffff"/>
+    <rect x="84" y="132" width="12" height="12" fill="url(#mark)"/>
+    <rect x="96" y="132" width="84" height="12" fill="#ffffff"/>
+    <rect x="12" y="144" width="168" height="12" fill="#ffffff"/>
+    <rect x="24" y="156" width="144" height="12" fill="#ffffff"/>
+    <rect x="36" y="168" width="36" height="12" fill="#ffffff"/>
+    <rect x="24" y="180" width="36" height="12" fill="#ffffff"/>
+  </g>
+</svg>

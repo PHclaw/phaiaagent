@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 462" width="940" height="462" role="img" aria-label="普通提醒与 PHAiagent 的对比">
+<title>同一个 09:00，产出不一样</title>
+<defs><marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker></defs>
+<rect x="0" y="0" width="940" height="462" rx="0" fill="#ffffff" stroke="#ffffff" stroke-width="1.5"/>
+<text x="470.0" y="50" font-size="24" fill="#0f172a" font-weight="700" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">同一个 09:00，产出不一样</text>
+<text x="470.0" y="76" font-size="13" fill="#64748b" font-weight="400" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">左边是提醒，右边是替你做完了一步</text>
+<rect x="40" y="110" width="350" height="300" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="64" y="146" font-size="15" fill="#64748b" font-weight="600" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">普通提醒软件</text>
+<rect x="64" y="164" width="302" height="168" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="84" y="196" font-size="11" fill="#94a3b8" font-weight="600" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">09:00</text>
+<text x="84" y="226" font-size="16" fill="#475569" font-weight="600" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">记得看项目进度</text>
+<text x="84" y="258" font-size="11" fill="#94a3b8" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">（这句话是上周你自己写的）</text>
+<text x="64" y="362" font-size="12" fill="#64748b" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">· 到点必响，内容不会变</text>
+<text x="64" y="386" font-size="12" fill="#64748b" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">· 不知道你手头有什么</text>
+<line x1="410" y1="260" x2="520" y2="260" stroke="#2563eb" stroke-width="2" marker-end="url(#head2)"/>
+<text x="465" y="246" font-size="11" fill="#2563eb" font-weight="600" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">换成</text>
+<rect x="540" y="110" width="360" height="300" rx="16" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="540" y="110" width="360" height="5" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+<text x="564" y="146" font-size="15" fill="#2563eb" font-weight="700" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">PHAiagent</text>
+<rect x="564" y="168" width="312" height="36" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<rect x="564" y="168" width="4" height="36" rx="2" fill="#dc2626" stroke="#dc2626" stroke-width="1.5"/>
+<text x="578" y="191" font-size="11" fill="#dc2626" font-weight="700" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">[今天到期]</text>
+<text x="648" y="191" font-size="12" fill="#334155" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">客户演示材料 · 15:00 评审</text>
+<rect x="564" y="212" width="312" height="36" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<rect x="564" y="212" width="4" height="36" rx="2" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="578" y="235" font-size="11" fill="#f59e0b" font-weight="700" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">[1 天内]</text>
+<text x="648" y="235" font-size="12" fill="#334155" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">服务器续费 · 卡号快过期</text>
+<rect x="564" y="256" width="312" height="36" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<rect x="564" y="256" width="4" height="36" rx="2" fill="#0ea5e9" stroke="#0ea5e9" stroke-width="1.5"/>
+<text x="578" y="279" font-size="11" fill="#0ea5e9" font-weight="700" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">[2 天内]</text>
+<text x="648" y="279" font-size="12" fill="#334155" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">API 文档 · 等前端确认字段</text>
+<rect x="564" y="308" width="312" height="56" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+<text x="578" y="330" font-size="12" fill="#1e3a8a" font-weight="600" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">读的是 deadlines.csv，不是猜的</text>
+<text x="578" y="350" font-size="11" fill="#2563eb" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">已完成项自动略过，剩几天它自己算</text>
+<text x="564" y="386" font-size="12" fill="#64748b" font-weight="400" text-anchor="start" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">· 有风险才响，没风险只记账</text>
+</svg>

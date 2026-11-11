@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PHAiagent · 像素变形动画</title>
+<style>
+  :root { --ink: #0f172a; --brand: #60a5fa; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #f6f7f8;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 18px;
+  }
+  .wrap { width: 100%; max-width: 640px; }
+  .back {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #64748b;
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .back:hover { color: var(--ink); }
+  .stage {
+    background: var(--ink);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, .18);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 22px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    color: #94a3b8;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+  }
+  .bar b { color: #f8fafc; font-size: 13px; letter-spacing: .2px; }
+  canvas { display: block; width: 100%; height: auto; background: var(--ink); }
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 22px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    color: #94a3b8;
+    font-size: 12px;
+  }
+  #phase { color: #60a5fa; font-weight: 600; letter-spacing: .4px; }
+  .controls { display: flex; gap: 8px; }
+  button {
+    font: inherit;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.06);
+    color: #e2e8f0;
+    cursor: pointer;
+  }
+  button:hover { background: rgba(255,255,255,.14); }
+  .links { margin-top: 14px; font-size: 12px; color: #94a3b8; }
+  .links a { color: #2563eb; text-decoration: none; margin-right: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← 返回任务管理</a>
+  <div class="stage">
+    <div class="bar"><span>PIXEL MORPH</span><b>PHAiagent</b></div>
+    <canvas id="stage" width="560" height="240"></canvas>
+    <div class="foot">
+      <span>状态：<span id="phase">LOGO</span></span>
+      <div class="controls">
+        <button id="pause">暂停</button>
+        <button id="flip">立即切换</button>
+      </div>
+    </div>
+  </div>
+  <div class="links">
+    <a href="?static=logo">看 LOGO 静态帧</a>
+    <a href="?static=text">看文字静态帧</a>
+    <a href="?">看自动循环</a>
+  </div>
+</div>
+
+<script>
+/* 16×16 源形状：与 logo.svg 同一套像素图 */
+const PIXELS = [
+  "................",
+  "...##########...",
+  "..############..",
+  ".##############.",
+  ".##############.",
+  ".######pppp####.",
+  ".######p##p####.",
+  ".######p##p####.",
+  ".######pppp####.",
+  ".######p#######.",
+  ".######p#######.",
+  ".######p#######.",
+  ".##############.",
+  "..############..",
+  "...###..........",
+  "..###...........",
+];
+
+const W = 560, H = 240, CELL = 12;
+const canvas = document.getElementById("stage");
+const ctx = canvas.getContext("2d", { alpha: false });
+
+function offscreen() {
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  return c;
+}
+
+/* 按步长采样不透明像素，得到粒子目标点 */
+function sample(context, step) {
+  const data = context.getImageData(0, 0, W, H).data;
+  const points = [];
+  for (let y = 0; y < H; y += step) {
+    for (let x = 0; x < W; x += step) {
+      const i = (y * W + x) * 4;
+      if (data[i + 3] > 120) {
+        points.push({ x, y, r: data[i], g: data[i + 1], b: data[i + 2] });
+      }
+    }
+  }
+  return points;
+}
+
+/* 形状 A：像素 logo */
+const cA = offscreen(), a = cA.getContext("2d");
+const side = 16 * CELL;
+const ox = (W - side) / 2, oy = (H - side) / 2;
+PIXELS.forEach((row, y) => {
+  for (let x = 0; x < 16; x++) {
+    const ch = row[x];
+    if (ch === "#") a.fillStyle = "#ffffff";
+    else if (ch === "p") a.fillStyle = "#38bdf8";
+    else continue;
+    a.fillRect(ox + x * CELL, oy + y * CELL, CELL, CELL);
+  }
+});
+
+/* 形状 B：英文文字 */
+const cB = offscreen(), b = cB.getContext("2d");
+b.fillStyle = "#60a5fa";
+b.font = '700 58px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif';
+b.textAlign = "center";
+b.textBaseline = "middle";
+b.fillText("PHAiagent", W / 2, H / 2);
+
+const A = sample(a, 5);
+const B = sample(b, 4);
+
+/* 随机映射：让粒子不是整体平移，而是真的打散重组 */
+const shuffled = B.slice();
+for (let i = shuffled.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+}
+
+const particles = [];
+const count = Math.max(A.length, B.length);
+for (let i = 0; i < count; i++) {
+  const from = A[i % A.length];
+  const to = shuffled[i % shuffled.length];
+  particles.push({
+    ax: from.x, ay: from.y,
+    bx: to.x + (Math.random() - .5) * 3,
+    by: to.y + (Math.random() - .5) * 3,
+    ar: from.r, ag: from.g, ab: from.b,
+    br: to.r, bg: to.g, bb: to.b,
+    jx: (Math.random() - .5) * 2,
+    jy: (Math.random() - .5) * 2,
+  });
+}
+
+const params = new URLSearchParams(location.search);
+const fixed = params.get("static");
+let t = 0, dir = 1, hold = 0, paused = false;
+if (fixed === "logo") { t = 0; paused = true; }
+if (fixed === "text") { t = 1; paused = true; }
+
+const ease = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const phase = document.getElementById("phase");
+const pauseBtn = document.getElementById("pause");
+const flipBtn = document.getElementById("flip");
+
+pauseBtn.onclick = () => {
+  paused = !paused;
+  pauseBtn.textContent = paused ? "继续" : "暂停";
+};
+flipBtn.onclick = () => {
+  dir = -dir;
+  hold = 0;
+  paused = false;
+  pauseBtn.textContent = "暂停";
+};
+
+function frame() {
+  if (!paused) {
+    if (hold > 0) hold--;
+    else {
+      t += dir * 0.009;
+      if (t >= 1) { t = 1; dir = -1; hold = 80; }
+      else if (t <= 0) { t = 0; dir = 1; hold = 80; }
+    }
+  }
+
+  const e = ease(t);
+  const chaos = Math.sin(Math.PI * e) * 26;
+
+  ctx.fillStyle = "#0f172a";
+  ctx.fillRect(0, 0, W, H);
+
+  for (const p of particles) {
+    const x = p.ax + (p.bx - p.ax) * e + p.jx * chaos;
+    const y = p.ay + (p.by - p.ay) * e + p.jy * chaos;
+    const r = (p.ar + (p.br - p.ar) * e) | 0;
+    const g = (p.ag + (p.bg - p.ag) * e) | 0;
+    const bl = (p.ab + (p.bb - p.ab) * e) | 0;
+    ctx.fillStyle = `rgb(${r},${g},${bl})`;
+    ctx.fillRect(x, y, 4, 4);
+  }
+
+  phase.textContent = e < .2 ? "LOGO" : e > .8 ? "PHAiagent" : "变形中…";
+  requestAnimationFrame(frame);
+}
+
+frame();
+</script>
+</body>
+</html>

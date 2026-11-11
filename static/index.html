@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PHAiagent · Personal Help AI Agent</title>
+<style>
+  :root {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --bg: #f6f7f8;
+    --brand: #2563eb;
+    --ok: #16a34a;
+    --bad: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    background: var(--ink);
+    color: #fff;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  header img { width: 40px; height: 40px; border-radius: 10px; }
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: .2px; }
+  header .sub { font-size: 11px; color: #94a3b8; letter-spacing: 1.2px; margin-bottom: 2px; }
+  header .status {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .anim {
+    margin-left: auto;
+    color: #60a5fa;
+    font-size: 12px;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,.18);
+    padding: 5px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .anim:hover { background: rgba(255,255,255,.1); }
+  .pill {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.1);
+    color: #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pill b { color: #fff; font-weight: 600; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #64748b; }
+  .dot.on { background: #22c55e; }
+  .dot.off { background: #ef4444; }
+  main { max-width: 920px; margin: 0 auto; padding: 28px 20px 80px; }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .toolbar h2 { font-size: 15px; font-weight: 600; }
+  button {
+    font: inherit;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    padding: 7px 14px;
+    transition: .15s;
+  }
+  button:hover { border-color: #cbd5e1; background: #f8fafc; }
+  button.primary {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+  }
+  button.primary:hover { background: #1d4ed8; }
+  button.ghost { border-color: transparent; color: var(--muted); }
+  button.ghost:hover { background: #eef2f6; color: var(--ink); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+  .card.off { opacity: .62; }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .card-title { font-size: 15px; font-weight: 600; }
+  .meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .tag {
+    background: #f1f5f9;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    color: #475569;
+  }
+  .tag.ok { background: #dcfce7; color: #15803d; }
+  .tag.bad { background: #fee2e2; color: #b91c1c; }
+  .excerpt {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-left: 2px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    color: #475569;
+    white-space: pre-wrap;
+    max-height: 96px;
+    overflow: hidden;
+  }
+  .actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+    background: #fff;
+  }
+  .empty b { display: block; color: var(--ink); margin-bottom: 6px; }
+  /* 模态 */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 88vh;
+    overflow: auto;
+    padding: 24px;
+  }
+  .modal h3 { font-size: 16px; margin-bottom: 18px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  .field { margin-bottom: 14px; }
+  input, select, textarea {
+    width: 100%;
+    font: inherit;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+  }
+  textarea { min-height: 92px; resize: vertical; font-size: 13px; }
+  .row { display: flex; gap: 12px; }
+  .row .field { flex: 1; }
+  .hint { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .result {
+    margin-top: 16px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 13px;
+    white-space: pre-wrap;
+    max-height: 320px;
+    overflow: auto;
+  }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    opacity: 0;
+    transition: .25s;
+    pointer-events: none;
+    z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.bad { background: #b91c1c; }
+  .spin { display: inline-block; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<header>
+  <img src="./logo.svg" alt="PHAiagent" />
+  <div>
+    <div class="sub">PERSONAL HELP AI AGENT</div>
+    <h1>PHAiagent</h1>
+  </div>
+  <a class="anim" href="./morph.html">像素动画 ↗</a>
+  <div class="status" id="status"></div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <h2>任务</h2>
+    <button class="primary" onclick="openForm()">+ 新建任务</button>
+  </div>
+  <div id="tasks"><div class="empty">加载中…</div></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3 id="modalTitle">新建任务</h3>
+    <form id="form" onsubmit="saveTask(event)">
+      <input type="hidden" id="taskId" />
+      <div class="field">
+        <label>任务名</label>
+        <input id="name" required maxlength="60" placeholder="每日简报" />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>每天执行时间</label>
+          <input id="schedule" required placeholder="09:00" pattern="\d{1,2}:\d{2}" />
+        </div>
+        <div class="field">
+          <label>Agent ID</label>
+          <input id="agentId" placeholder="留空用 .env 里的默认 Agent" />
+        </div>
+      </div>
+      <div class="field">
+        <label>提示词（可用 {date} {time} {name}）</label>
+        <textarea id="prompt" placeholder="今天是 {date}。用三条要点总结今天的关注点，每条给一句建议。"></textarea>
+        <div class="hint">留空则使用内置的日报模板</div>
+      </div>
+      <div class="field">
+        <label>输入文件（相对扩展目录，逗号分隔多个）</label>
+        <input id="inputs" placeholder="examples/deadlines.csv" />
+        <div class="hint">文件内容会作为「输入资料」接在提示词后面，不申请任何云账号授权</div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>推送渠道</label>
+          <select id="kind">
+            <option value="email">邮件</option>
+            <option value="generic">通用 webhook</option>
+            <option value="wecom">企业微信</option>
+            <option value="dingtalk">钉钉</option>
+            <option value="feishu">飞书</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>收件人 / Webhook 地址</label>
+          <input id="target" placeholder="you@example.com" />
+          <div class="hint" id="targetHint">邮件填收件邮箱，可逗号分隔多个</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>失败重试次数</label>
+          <input id="retry" type="number" min="0" max="5" value="0" />
+          <div class="hint">按 2s / 4s / 8s 退避重试</div>
+        </div>
+        <div class="field">
+          <label>仅在内容匹配时推送（正则）</label>
+          <input id="pushIf" placeholder="留空总是推送，例：阻塞|今天到期" />
+          <div class="hint">没命中只记录不打扰，适合「有风险才报警」</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>触发方式</label>
+          <select id="trigger">
+            <option value="cron">定时（每天到点）</option>
+            <option value="event">事件驱动（收到 webhook 就执行）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>事件来源（仅事件驱动）</label>
+          <input id="eventSource" placeholder="github" />
+        </div>
+      </div>
+      <div class="field">
+        <label>事件内容匹配正则（仅事件驱动）</label>
+        <input id="eventFilter" placeholder="Excel|bug" />
+        <div class="hint">留空接收该来源的全部事件；推送地址形如 /events/github</div>
+      </div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input id="needApproval" type="checkbox" style="width:16px;height:16px" />
+          <span>生成后先挂起，等我点确认再发送</span>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="ghost" onclick="closeForm()">取消</button>
+        <button type="submit" class="primary">保存</button>
+      </div>
+    </form>
+    <div id="formResult"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+function toast(msg, bad = false) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.className = "toast show" + (bad ? " bad" : "");
+  setTimeout(() => (el.className = "toast"), 2600);
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!res.ok) {
+    const detail = (data && data.detail) || text || `HTTP ${res.status}`;
+    throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+  }
+  return data;
+}
+
+async function loadHealth() {
+  try {
+    const h = await api("/health");
+    const pi = h.pi || {};
+    const piOk = pi.enabled && pi.available;
+    const piText = pi.error ? "PiAgent 未连通" : piOk ? "PiAgent 就绪" : "PiAgent 未启用";
+    $("status").innerHTML = `
+      <span class="pill"><span class="dot ${piOk ? "on" : "off"}"></span>${piText}</span>
+      <span class="pill">后端 <b>${h.base_url || "-"}</b></span>
+      <span class="pill">任务 <b>${h.tasks ?? 0}</b></span>
+    `;
+  } catch (e) {
+    $("status").innerHTML = `<span class="pill"><span class="dot off"></span>服务异常</span>`;
+  }
+}
+
+function fmt(iso) {
+  if (!iso) return "从未执行";
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function kindLabel(k) {
+  return { email: "邮件", generic: "Webhook", wecom: "企业微信", dingtalk: "钉钉", feishu: "飞书" }[k] || k;
+}
+
+async function loadTasks() {
+  const box = $("tasks");
+  try {
+    const tasks = await api("/tasks");
+    if (!tasks.length) {
+      box.innerHTML = `<div class="empty"><b>还没有任务</b>点右上角「新建任务」，让它每天到点自己干活</div>`;
+      return;
+    }
+    box.innerHTML = tasks.map((t) => {
+      const statusTag = t.last_status
+        ? `<span class="tag ${t.last_status === "ok" ? "ok" : "bad"}">${
+            t.last_status === "ok" ? "上次成功" : "上次失败"
+          }</span>`
+        : `<span class="tag">未执行</span>`;
+      return `
+      <div class="card ${t.enabled ? "" : "off"}">
+        <div class="card-top">
+          <div style="flex:1;min-width:180px">
+            <div class="card-title">${escapeHtml(t.name)}</div>
+            <div class="meta">
+              <span class="tag">${t.trigger === "event" ? "事件触发" : "每天 " + t.schedule}</span>
+              ${t.require_approval ? `<span class="tag">需确认</span>` : ""}
+              ${(t.inputs || []).length ? `<span class="tag">输入 ${t.inputs.length} 个文件</span>` : ""}
+              <span class="tag">${kindLabel(t.webhook_kind)}${t.webhook_url ? " · " + escapeHtml(t.webhook_url) : ""}</span>
+              ${statusTag}
+              <span>${t.last_run_at ? "上次 " + fmt(t.last_run_at) : ""}</span>
+            </div>
+          </div>
+        </div>
+        ${t.last_excerpt ? `<div class="excerpt">${plain(t.last_excerpt)}</div>` : ""}
+        ${t.last_error ? `<div class="excerpt" style="border-left-color:#fecaca;color:#b91c1c">${plain(t.last_error)}</div>` : ""}
+        <div class="actions">
+          <button onclick="runTask('${t.id}', this)">立即运行</button>
+          <button onclick="showHistory('${t.id}', this)">历史</button>
+          <button onclick="testPush('${t.id}', this)">测推送</button>
+          <button onclick="openForm('${t.id}')">编辑</button>
+          <button onclick="toggleTask('${t.id}', ${t.enabled})">${t.enabled ? "停用" : "启用"}</button>
+          <button class="ghost" onclick="removeTask('${t.id}')">删除</button>
+        </div>
+      </div>`;
+    }).join("");
+  } catch (e) {
+    box.innerHTML = `<div class="empty"><b>加载失败</b>${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+/* 摘要里去掉 Markdown 记号，列表项前置圆点，读起来干净些 */
+function plain(s) {
+  const cleaned = String(s == null ? "" : s)
+    .replace(/\*\*/g, "")
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/^>\s*/gm, "")
+    .replace(/^- /gm, "· ");
+  return escapeHtml(cleaned);
+}
+
+let cache = [];
+
+async function openForm(id) {
+  cache = await api("/tasks").catch(() => []);
+  const task = id ? cache.find((t) => t.id === id) : null;
+  $("modalTitle").textContent = task ? "编辑任务" : "新建任务";
+  $("taskId").value = task ? task.id : "";
+  $("name").value = task ? task.name : "";
+  $("schedule").value = task ? task.schedule : "09:00";
+  $("agentId").value = task ? task.agent_id : "";
+  $("prompt").value = task ? task.prompt : "";
+  $("inputs").value = task ? (task.inputs || []).join(", ") : "";
+  $("retry").value = task ? (task.retry || 0) : 0;
+  $("pushIf").value = task ? (task.push_if || "") : "";
+  $("trigger").value = task ? (task.trigger || "cron") : "cron";
+  $("eventSource").value = task ? (task.event_source || "") : "";
+  $("eventFilter").value = task ? (task.event_filter || "") : "";
+  $("needApproval").checked = task ? !!task.require_approval : false;
+  $("kind").value = task ? task.webhook_kind : "email";
+  $("target").value = task ? task.webhook_url : "";
+  $("formResult").innerHTML = "";
+  syncTargetHint();
+  $("overlay").classList.add("show");
+}
+
+function closeForm() {
+  $("overlay").classList.remove("show");
+}
+
+function syncTargetHint() {
+  const kind = $("kind").value;
+  const map = {
+    email: "邮件填收件邮箱，可逗号分隔多个；留空用 .env 的 MAIL_TO",
+    generic: "任何接受 {\"text\": \"...\"} 的地址，Slack 也是这个格式",
+    wecom: "企业微信群机器人 Webhook 地址",
+    dingtalk: "钉钉群机器人 Webhook 地址（不支持加签）",
+    feishu: "飞书群机器人 Webhook 地址",
+  };
+  $("targetHint").textContent = map[kind] || "";
+  $("target").placeholder = kind === "email" ? "you@example.com" : "https://...";
+}
+
+$("kind").addEventListener("change", syncTargetHint);
+
+async function saveTask(e) {
+  e.preventDefault();
+  const id = $("taskId").value;
+  const payload = {
+    name: $("name").value.trim(),
+    schedule: $("schedule").value.trim(),
+    agent_id: $("agentId").value.trim() || null,
+    prompt: $("prompt").value.trim() || null,
+    inputs: $("inputs").value.split(/[,;]/).map((s) => s.trim()).filter(Boolean),
+    retry: Number($("retry").value) || 0,
+    push_if: $("pushIf").value.trim() || null,
+    trigger: $("trigger").value,
+    event_source: $("eventSource").value.trim() || null,
+    event_filter: $("eventFilter").value.trim() || null,
+    require_approval: $("needApproval").checked,
+    webhook_kind: $("kind").value,
+    webhook_url: $("target").value.trim() || null,
+  };
+  try {
+    if (id) {
+      await api(`/tasks/${id}`, { method: "PATCH", body: JSON.stringify(payload) });
+      toast("已保存");
+    } else {
+      await api("/tasks", { method: "POST", body: JSON.stringify(payload) });
+      toast("任务已创建");
+    }
+    closeForm();
+    loadTasks();
+    loadHealth();
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+
+async function runTask(id, btn) {
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spin">◌</span> 运行中`;
+  try {
+    const r = await api(`/tasks/${id}/run?push=true`, { method: "POST" });
+    $("formResult").innerHTML = "";
+    toast(r.push_error ? "已生成，但推送失败" : "已生成并推送", !!r.push_error);
+    const card = btn.closest(".card");
+    let box = card.querySelector(".run-result");
+    if (!box) {
+      box = document.createElement("div");
+      box.className = "result run-result";
+      card.appendChild(box);
+    }
+    box.textContent = r.text + (r.push_error ? `\n\n推送失败：${r.push_error}` : "");
+    loadTasks();
+  } catch (err) {
+    toast(err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = old;
+  }
+}
+
+async function testPush(id, btn) {
+  const old = btn.textContent;
+  btn.disabled = true;
+  try {
+    await api(`/tasks/${id}/test-webhook`, { method: "POST" });
+    toast("推送通道正常");
+  } catch (err) {
+    toast(err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = old;
+  }
+}
+
+async function toggleTask(id, enabled) {
+  try {
+    await api(`/tasks/${id}`, { method: "PATCH", body: JSON.stringify({ enabled: !enabled }) });
+    loadTasks();
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+
+async function removeTask(id) {
+  if (!confirm("删除这个任务？")) return;
+  try {
+    await api(`/tasks/${id}`, { method: "DELETE" });
+    toast("已删除");
+    loadTasks();
+    loadHealth();
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+
+/* 运行历史：再点一次收起 */
+async function showHistory(id, btn) {
+  const card = btn.closest(".card");
+  const existing = card.querySelector(".history-box");
+  if (existing) {
+    existing.remove();
+    return;
+  }
+  try {
+    const data = await api(`/runs?task_id=${id}&limit=20`);
+    const box = document.createElement("div");
+    box.className = "result history-box";
+    if (!data.records.length) {
+      box.textContent = "还没有运行记录";
+    } else {
+      const s = data.stats;
+      const pushLabel = { ok: "已推送", skipped: "按规则跳过", failed: "推送失败", none: "未推送" };
+      box.innerHTML =
+        `<div style="margin-bottom:8px;color:#64748b">共 ${s.total} 次 · 成功 ${s.ok} · 失败 ${s.failed} · 成功率 ${s.success_rate ?? "-"}%</div>` +
+        data.records.map((r) => `
+          <div style="padding:7px 0;border-top:1px solid #e2e8f0">
+            <span style="color:${r.ok ? "#16a34a" : "#dc2626"};font-weight:600">${r.ok ? "成功" : "失败"}</span>
+            <span style="color:#94a3b8;margin-left:8px">${fmt(r.started_at)}</span>
+            <span style="color:#94a3b8;margin-left:8px">${((r.duration_ms || 0) / 1000).toFixed(1)}s</span>
+            <span style="color:#94a3b8;margin-left:8px">${pushLabel[r.push] || "-"}</span>
+            ${r.attempts > 1 ? `<span style="color:#b45309;margin-left:8px">重试 ${r.attempts - 1} 次</span>` : ""}
+            ${r.excerpt ? `<div style="color:#475569;margin-top:4px">${plain(r.excerpt)}</div>` : ""}
+            ${r.error ? `<div style="color:#b91c1c;margin-top:4px">${plain(r.error)}</div>` : ""}
+          </div>`).join("");
+    }
+    card.appendChild(box);
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+
+$("overlay").addEventListener("click", (e) => {
+  if (e.target === $("overlay")) closeForm();
+});
+
+loadHealth();
+loadTasks();
+setInterval(loadHealth, 30000);
+
+/* 支持 /ui/?new=1 直接打开新建表单，/ui/?edit=<id> 打开指定任务 */
+const query = new URLSearchParams(location.search);
+if (query.get("new") === "1") openForm();
+else if (query.get("edit")) openForm(query.get("edit"));
+</script>
+</body>
+</html>

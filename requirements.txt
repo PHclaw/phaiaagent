@@ -1,0 +1,5 @@
+# daily-briefing 扩展的独立依赖
+# 刻意保持最小：调度用 asyncio、存储用 JSON，不引 APScheduler / 数据库驱动
+fastapi>=0.110
+uvicorn>=0.27
+httpx>=0.27
