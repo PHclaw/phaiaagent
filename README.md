@@ -52,15 +52,15 @@
 
 ## 关于位置
 
-它是 AgentFlow 的一个独立扩展，不 import 主项目任何模块，只通过 HTTP 用主后端两个能力：
+它通过 HTTP 调用 AgentFlow 主后端，不 import 对方任何模块：
 
 ```
 登录换 token  →  POST /api/v1/pi/{agent_id}/run  →  拿到文本 + 产物  →  投递
 ```
 
-所以能单独拷走、单独部署、单独开源；删掉它不影响主项目任何功能。
+所以它是一个独立服务：单独部署、单独升级，主项目升级不会冲掉你的定制；删掉它也不影响主项目任何功能。
 
-> 目录名 `daily-briefing` 是它最早的功能定位，保留不动；产品名是 PHAiagent。
+后端不一定要是 AgentFlow —— 任何提供「登录换 token + 同步执行并返回文本」两个接口的服务，接在 `client.py` 里就能用。
 
 ## 内置场景包
 
@@ -85,7 +85,8 @@
 ## 快速开始
 
 ```bash
-cd extensions/daily-briefing
+git clone https://github.com/PHclaw/phaiaagent.git
+cd phaiaagent
 
 # 1) 装依赖（只有三个）
 python -m venv .venv
@@ -266,8 +267,8 @@ Description=PHAiagent
 After=network.target
 
 [Service]
-WorkingDirectory=/opt/agentflow/extensions/daily-briefing
-ExecStart=/opt/agentflow/extensions/daily-briefing/.venv/bin/python main.py
+WorkingDirectory=/opt/phaiaagent
+ExecStart=/opt/phaiaagent/.venv/bin/python main.py
 Restart=always
 RestartSec=5
 
